@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Property Rental Management{% endblock %}</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Card hover effect */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Gradient background */
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen">
+    
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="{{ url_for('main.index') }}" class="flex items-center space-x-3">
+                        <i class="fas fa-home text-3xl text-indigo-600"></i>
+                        <span class="text-xl font-bold text-gray-800">RentalHub</span>
+                    </a>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('main.dashboard') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-chart-line mr-2"></i>Dashboard
+                        </a>
+                        <a href="{{ url_for('properties.list_properties') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-building mr-2"></i>Properties
+                        </a>
+                        <a href="{{ url_for('tenants.list_tenants') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-users mr-2"></i>Tenants
+                        </a>
+                        <a href="{{ url_for('leases.list_leases') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-file-contract mr-2"></i>Leases
+                        </a>
+                        <a href="{{ url_for('payments.list_payments') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-dollar-sign mr-2"></i>Payments
+                        </a>
+                        <a href="{{ url_for('maintenance.list_requests') }}" class="text-gray-700 hover:text-indigo-600 transition">
+                            <i class="fas fa-tools mr-2"></i>Maintenance
+                        </a>
+                        
+                        <!-- User Dropdown -->
+                        <div class="relative group">
+                            <button class="flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition">
+                                <i class="fas fa-user-circle text-2xl"></i>
+                                <span>{{ current_user.username }}</span>
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                                <a href="{{ url_for('main.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user mr-2"></i>Profile
+                                </a>
+                                <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="text-gray-700 hover:text-indigo-600 transition">Login</a>
+                        <a href="{{ url_for('auth.register') }}" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                            Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-indigo-600">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.dashboard') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Dashboard</a>
+                    <a href="{{ url_for('properties.list_properties') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Properties</a>
+                    <a href="{{ url_for('tenants.list_tenants') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Tenants</a>
+                    <a href="{{ url_for('leases.list_leases') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Leases</a>
+                    <a href="{{ url_for('payments.list_payments') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Payments</a>
+                    <a href="{{ url_for('maintenance.list_requests') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Maintenance</a>
+                    <a href="{{ url_for('main.profile') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Profile</a>
+                    <a href="{{ url_for('auth.logout') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Logout</a>
+                {% else %}
+                    <a href="{{ url_for('auth.login') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Login</a>
+                    <a href="{{ url_for('auth.register') }}" class="block px-3 py-2 text-gray-700 hover:bg-gray-100 rounded">Sign Up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+                {% for category, message in messages %}
+                    <div class="fade-in rounded-lg p-4 mb-4 {% if category == 'error' %}bg-red-100 text-red-700 border border-red-400{% elif category == 'success' %}bg-green-100 text-green-700 border border-green-400{% else %}bg-blue-100 text-blue-700 border border-blue-400{% endif %}">
+                        <div class="flex items-center justify-between">
+                            <span><i class="fas fa-info-circle mr-2"></i>{{ message }}</span>
+                            <button onclick="this.parentElement.parentElement.remove()" class="text-xl font-bold">&times;</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">RentalHub</h3>
+                    <p class="text-gray-400">Modern property rental management system for landlords and tenants.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Connect</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter text-2xl"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram text-2xl"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2026 RentalHub. All rights reserved. Created by Kashaf Memon</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

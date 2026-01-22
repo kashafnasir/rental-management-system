@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Property Details{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto fade-in">
+    <a href="{{ url_for('properties.list_properties') }}" class="text-indigo-600 hover:text-indigo-700 mb-4 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Back to Properties
+    </a>
+    
+    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+        {% if property.image_path %}
+            <img src="{{ url_for('static', filename=property.image_path) }}" class="w-full h-96 object-cover">
+        {% else %}
+            <div class="w-full h-96 bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center">
+                <i class="fas fa-building text-white text-8xl"></i>
+            </div>
+        {% endif %}
+        
+        <div class="p-8">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">{{ property.property_type|title }}</h1>
+                    <p class="text-gray-600 text-lg mt-2">
+                        <i class="fas fa-map-marker-alt mr-2"></i>{{ property.address }}, {{ property.city }}, {{ property.state }}
+                    </p>
+                </div>
+                <span class="px-4 py-2 rounded-full font-semibold
+                    {% if property.availability_status == 'available' %}bg-green-100 text-green-700
+                    {% elif property.availability_status == 'occupied' %}bg-blue-100 text-blue-700
+                    {% else %}bg-yellow-100 text-yellow-700{% endif %}">
+                    {{ property.availability_status|title }}
+                </span>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <i class="fas fa-bed text-indigo-600 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-800">{{ property.bedrooms }}</p>
+                    <p class="text-gray-600 text-sm">Bedrooms</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <i class="fas fa-bath text-indigo-600 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-800">{{ property.bathrooms }}</p>
+                    <p class="text-gray-600 text-sm">Bathrooms</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <i class="fas fa-ruler-combined text-indigo-600 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-800">{{ property.area_sqft }}</p>
+                    <p class="text-gray-600 text-sm">Sq Ft</p>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg text-center">
+                    <i class="fas fa-pkr-sign text-indigo-600 text-2xl mb-2"></i>
+                    <p class="text-2xl font-bold text-gray-800">pkr{{ "%.2f"|format(property.rent_amount) }}</p>
+                    <p class="text-gray-600 text-sm">/ month</p>
+                </div>
+            </div>
+            
+            {% if property.description %}
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold text-gray-800 mb-3">Description</h3>
+                <p class="text-gray-700 leading-relaxed">{{ property.description }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="flex space-x-4">
+                <a href="{{ url_for('properties.edit_property', id=property.id) }}" 
+                   class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition">
+                    <i class="fas fa-edit mr-2"></i>Edit Property
+                </a>
+                <a href="{{ url_for('leases.add_lease') }}" 
+                   class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+                    <i class="fas fa-file-contract mr-2"></i>Create Lease
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

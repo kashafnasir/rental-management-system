@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Add Maintenance Request{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto fade-in">
+    <a href="{{ url_for('maintenance.list_requests') }}" class="text-indigo-600 mb-4 inline-block">
+        <i class="fas fa-arrow-left mr-2"></i>Back
+    </a>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">New Maintenance Request</h1>
+    
+    <div class="bg-white rounded-xl shadow-md p-8">
+        <form method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Property <span class="text-red-500">*</span></label>
+                    <select name="property_id" required class="w-full px-4 py-3 border rounded-lg">
+                        <option value="">Select Property</option>
+                        {% for property in properties %}
+                        <option value="{{ property.id }}">{{ property.address }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Tenant <span class="text-red-500">*</span></label>
+                    <select name="tenant_id" required class="w-full px-4 py-3 border rounded-lg">
+                        <option value="">Select Tenant</option>
+                        {% for tenant in tenants %}
+                        <option value="{{ tenant.id }}">{{ tenant.user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Request Type <span class="text-red-500">*</span></label>
+                    <input type="text" name="request_type" required placeholder="e.g., Plumbing, Electrical"
+                           class="w-full px-4 py-3 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Priority</label>
+                    <select name="priority" class="w-full px-4 py-3 border rounded-lg">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-gray-700 font-semibold mb-2">Description <span class="text-red-500">*</span></label>
+                    <textarea name="description" required rows="4" class="w-full px-4 py-3 border rounded-lg"></textarea>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-3 border rounded-lg">
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button type="submit" class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-save mr-2"></i>Save Request
+                </button>
+                <a href="{{ url_for('maintenance.list_requests') }}" class="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg text-center">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
